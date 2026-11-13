@@ -2,14 +2,14 @@ import os
 
 from django.conf import settings
 
-# Admin errors would try to mail an unconfigured relay; the portal owner is notified out-of-band
+# ADMINS mail an unconfigured relay -> errors crash; owner notified out-of-band
 settings.ADMINS = ()
 
 from django.contrib.auth import get_user_model
 
 from blogs.models import Stylesheet
 
-# Blog.save() copies the 'default' stylesheet; upstream ships it only in the SaaS database
+# Blog.save() copies 'default' stylesheet — upstream ships it only in the SaaS DB
 Stylesheet.objects.get_or_create(identifier="default", title="Default", css="")
 
 email = os.environ["BB_ADMIN_EMAIL"].strip().lower()
@@ -21,6 +21,6 @@ if not user and password:
     print(f"Created blog owner account: {email}")
 
 if user:
-    # Unlocks blog dashboards normally gated behind the SaaS paid plans
+    # unlocks dashboards gated behind SaaS paid plans
     user.settings.upgraded = True
     user.settings.save()

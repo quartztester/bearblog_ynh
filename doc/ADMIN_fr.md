@@ -1,38 +1,33 @@
-Le compte propriétaire du blog (identifiant = l'email de l'administrateur
-YunoHost) est créé à l'installation ; son mot de passe initial se trouve dans
-`/home/yunohost.app/bearblog/admin_credentials.txt` (lisible en root) et n'est pas modifié
-par les mises à jour. Les autres utilisateurs s'inscrivent sur
-`https://votredomaine.tld/signup/` ; toute inscription peut créer un blog
-(comportement identique au SaaS amont).
+Compte blog = email de l'admin YunoHost. Créé à l'installation. Mot de passe
+initial : `/home/yunohost.app/bearblog/admin_credentials.txt` (root seul). Les
+mises à jour ne le changent jamais. Autres utilisateurs : inscription libre sur
+`https://votredomaine.tld/signup/` — chaque inscrit peut créer un blog, comme le
+SaaS amont.
 
 ### Blogs sur sous-domaines
 
-Bear Blog résout les blogs par nom d'hôte : `monblog.votredomaine.tld`. Ces noms
-doient résoudre (un enregistrement wildcard `*.votredomaine.tld` est le plus
-simple) et disposer d'un certificat TLS les couvrant. YunoHost ne délivre de
-certificat wildcard que pour les domaines dont le DNS est reconnu (`yunohost
-domain add --install-letsencrypt-cert` sur un domaine à résolution wildcard).
-Sans certificat wildcard, le navigateur affiche un avertissement TLS sur les
-sous-domaines de blog ; le site principal n'est pas affecté.
+Bear Blog choisit le blog par nom d'hôte : `monblog.votredomaine.tld`. Les
+sous-domaines doivent résoudre (wildcard `*.votredomaine.tld` A/AAAA, le plus
+simple) et avoir un certificat couvrant. YunoHost délivre un certificat wildcard
+seulement pour les domaines DNS reconnus (`yunohost domain add
+--install-letsencrypt-cert` sur domaine à résolution wildcard). Sans wildcard =
+avertissement TLS sur les sous-domaines. Site principal épargné.
 
-Le paquet installe un bloc serveur nginx supplémentaire pour `*.votredomaine.tld`
-(`/etc/nginx/conf.d/bearblog-blogs.conf`) ; les hôtes qui sont de vrais
-domaines YunoHost gardent leurs blocs existants.
+Le paquet pose un bloc serveur nginx `*.votredomaine.tld` dans
+`/etc/nginx/conf.d/bearblog-blogs.conf`. Les vrais domaines YunoHost gardent
+leurs blocs, intacts.
 
-### Parties SaaS inactives
+### Parties SaaS, mortes ici
 
-- Les pages « upgrade/plan » du tableau de bord pointent vers les URLs de
-  paiement amont et sont inutiles en auto-hébergement. Les comptes
-  propriétaires sont marqués « upgraded » pour garder toutes les
-  fonctionnalités accessibles.
-- Le centre média téléverse vers un compatible S3 configuré via
-  `OBJECT_STORAGE_*` dans `/var/www/bearblog/.env` (vide par défaut → les
-  téléversements sont refusés proprement).
-- Les emails (listes, réinitialisation) partent via le Postfix de la machine
-  avec `From : bearblog@votredomaine.tld` ; ce domaine doit être servi par ce
-  serveur sinon le relais refusera le message.
+- Pages « upgrade/plan » du tableau de bord : URLs de paiement amont. Inutiles
+  en auto-hébergement. Comptes propriétaires marqués « upgraded », toutes
+  fonctions ouvertes.
+- Le centre média veut un bucket S3 via `OBJECT_STORAGE_*` dans
+  `/var/www/bearblog/.env`. Vide = téléversement refusé, message clair.
+- Les emails (listes, réinitialisation) partent via Postfix local,
+  `From : bearblog@votredomaine.tld`. Ce domaine doit être servi ici sinon refus.
 
-Pas de panneau de configuration : les secrets sont dans les réglages de
-l'app (`yunohost app setting bearblog secret_key`), les réglages Django dans
-`/var/www/bearblog/conf/settings.py`, et la base est le fichier SQLite
+Pas de panneau de configuration. Secrets dans les réglages de l'app
+(`yunohost app setting bearblog secret_key`). Réglages Django :
+`/var/www/bearblog/conf/settings.py`. Base : SQLite
 `/home/yunohost.app/bearblog/dev.db`.
