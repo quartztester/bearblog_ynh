@@ -4,6 +4,6 @@ test_format = 1.0
 
 [default]
 
-    # Upstream templates hardcode absolute '/' links and blogs are routed by
-    # hostname, so sub-path installs and URL changes are not supported.
+    # Upstream templates hardcode absolute '/' links; blogs routed by hostname.
+    # No sub-path installs, no URL changes.
     exclude = ["install.subdir", "change_url"]

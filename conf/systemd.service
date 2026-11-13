@@ -11,10 +11,7 @@ Environment=DJANGO_SETTINGS_MODULE=conf.settings
 ExecStart=__INSTALL_DIR__/.venv/bin/gunicorn conf.wsgi --bind 127.0.0.1:__PORT__ --timeout 24 --graceful-timeout 5 --max-requests 10000 --log-file /var/log/__APP__/__APP__.log
 StandardError=inherit
 
-### Depending on specificities of your service/app, you may need to tweak these
-# .. but this should be a good baseline
-# Sandboxing options to harden security
-# Details for these options: https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+# Sandboxing. Details: https://www.freedesktop.org/software/systemd/man/systemd.exec.html
 NoNewPrivileges=yes
 PrivateTmp=yes
 PrivateDevices=yes
@@ -31,12 +28,11 @@ ProtectKernelModules=yes
 ProtectKernelTunables=yes
 LockPersonality=yes
 SystemCallArchitectures=native
-# ponytail: ~@privileged dropped - on arm64/bookworm systemd it denies fchownat and
-# SIGSYS-kills gunicorn at startup (CI audit syscall=54). Re-add per-arch if upstream fixes.
+# ponytail: no ~@privileged - arm64/bookworm systemd denies fchownat,
+# SIGSYS-kills gunicorn at start (CI audit syscall=54). Re-add per-arch if fixed.
 SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap @cpu-emulation
 
-# Denying options to capabilities that should not be relevant for webapps
-# Doc: https://manpages.ubuntu.com/manpages/jammy/en/man7/capabilities.7.html
+# Drop webapp-unneeded capabilities. Doc: https://manpages.ubuntu.com/manpages/jammy/en/man7/capabilities.7.html
 CapabilityBoundingSet=~CAP_RAWIO CAP_MKNOD
 CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
 CapabilityBoundingSet=~CAP_SYS_BOOT CAP_SYS_TIME CAP_SYS_MODULE CAP_SYS_PACCT

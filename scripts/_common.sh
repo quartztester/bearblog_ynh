@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Standalone CPython runtime ($install_dir/python + .venv), rebuilt from
-# requirements.txt on install/upgrade/restore (Django 6 > bookworm python 3.11).
+# Standalone CPython ($install_dir/python + .venv). Rebuilt from
+# requirements.txt on install/upgrade/restore. Django 6 > bookworm python 3.11.
 _build_runtime() {
     ynh_setup_source --dest_dir="$install_dir"
     ynh_setup_source --source_id=cpython --dest_dir="$install_dir"
 
-    # Relocated standalone CPython hardcodes CC=clang for any sdist build
+    # Relocated CPython hardcodes CC=clang for sdist builds
     ynh_exec_as_app env CC=gcc HOME="$install_dir" \
         bash -c "'$install_dir'/python/bin/python3 -m venv '$install_dir'/.venv && '$install_dir'/.venv/bin/pip install --quiet --no-cache-dir -r '$install_dir'/requirements.txt"
 
@@ -23,7 +23,7 @@ _run_manage() {
     ynh_exec_as_app bash -c "cd '$install_dir' && .venv/bin/python manage.py $*"
 }
 
-# Blog owner account; password in a 600 file under data_dir. Idempotent.
+# Blog owner account. Password: 600 file in data_dir. Idempotent.
 _bootstrap_data() {
     local creds="$data_dir/admin_credentials.txt"
     if [ ! -f "$creds" ]; then
@@ -34,15 +34,15 @@ _bootstrap_data() {
 
     _run_manage "migrate --noinput"
     _run_manage "collectstatic --noinput --clear"
-    # ynh_exec_as_app sudo resets the env -> pass vars via env
+    # sudo resets env -> pass vars via env
     ynh_exec_as_app env \
         BB_ADMIN_EMAIL="$(ynh_user_get_info --username="$admin" --key=mail)" \
         BB_ADMIN_PASSWORD="$(cat "$creds")" \
         bash -c "cd '$install_dir' && .venv/bin/python manage.py shell" < "$YNH_APP_BASEDIR/conf/bootstrap.py"
 }
 
-# Host-based blog routing needs a wildcard server block outside the app's
-# nginx snippet; TLS reuses the main domain's cert, see doc/ADMIN.md.
+# Host-based routing needs wildcard server block outside app nginx snippet.
+# TLS reuses main domain cert, see doc/ADMIN.md.
 _add_blogs_nginx() {
     ynh_config_add --template="nginx_blogs.conf" --destination="/etc/nginx/conf.d/$app-blogs.conf"
     ynh_systemctl --service=nginx --action=reload
