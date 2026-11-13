@@ -1,32 +1,17 @@
 #!/bin/bash
 
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
-# Upstream templates hardcode absolute '/' links
 [ "${path:-/}" = "/" ] || ynh_die "Bear Blog routes blogs by hostname and must be installed at the root of the domain (path=/)."
-
-#=================================================
-# INITIALIZE AND STORE SETTINGS
-#=================================================
 
 ynh_app_setting_set_default --key=secret_key --value="$(ynh_string_random --length=50)"
 ynh_app_setting_set_default --key=analytics_salt --value="$(ynh_string_random --length=32)"
 
-#=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
-#=================================================
 ynh_script_progression "Setting up source files..."
 
 _build_runtime
 
-#=================================================
-# APP INITIAL CONFIGURATION
-#=================================================
 ynh_script_progression "Adding $app's configuration files..."
 
 _render_config
@@ -34,16 +19,24 @@ _render_config
 mkdir -p "$data_dir"
 chown "$app:$app" "$data_dir"
 
-#=================================================
-# INITIALIZE DATA
-#=================================================
 ynh_script_progression "Initializing the database..."
 
-_bootstrap_data
+# Kept across runs: regenerating it would desync the account from the database.
+creds="$data_dir/admin_credentials.txt"
+if [ ! -f "$creds" ]; then
+    echo "$(ynh_string_random --length=24)" > "$creds"
+fi
+chmod 600 "$creds"
+chown "$app:$app" "$creds"
 
-#=================================================
-# SYSTEM CONFIGURATION
-#=================================================
+_run_manage "migrate --noinput"
+_run_manage "collectstatic --noinput --clear"
+# ynh_exec_as_app runs through sudo, which resets the environment
+ynh_exec_as_app env \
+    BB_ADMIN_EMAIL="$(ynh_user_get_info --username="$admin" --key=mail)" \
+    BB_ADMIN_PASSWORD="$(cat "$creds")" \
+    bash -c "cd '$install_dir' && .venv/bin/python manage.py shell" < "$YNH_APP_BASEDIR/conf/bootstrap.py"
+
 ynh_script_progression "Adding system configurations related to $app..."
 
 ynh_config_add_nginx
@@ -55,16 +48,9 @@ yunohost service add "$app" --description="Bear Blog publishing platform" --log=
 
 ynh_config_add_logrotate
 
-#=================================================
-# START SYSTEMD SERVICE
-#=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="start" --wait_until="Booting worker"
-
-#=================================================
-# END OF SCRIPT
-#=================================================
 
 ynh_script_progression "Installation of $app completed"
 ynh_print_info "Blog owner: $(ynh_user_get_info --username="$admin" --key=mail) - initial password in $data_dir/admin_credentials.txt - sign in at https://$domain/accounts/login/ (blogs need DNS + wildcard cert for subdomains, see doc/ADMIN.md)"

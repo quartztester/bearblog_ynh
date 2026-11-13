@@ -59,8 +59,7 @@ ram.runtime = "200M"
     in_subdir = 1
     autoupdate.strategy = "latest_github_commit"
 
-    # Django 6 requires Python >= 3.12; bookworm ships 3.11 -> pinned standalone CPython
-    # (no generic url: ynh_setup_source only honors per-arch keys when none is set)
+    # No generic url: ynh_setup_source only honors per-arch keys when none is set
     [resources.sources.cpython]
     amd64.url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.13.18%2B20261110-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
     amd64.sha256 = "f2d2199eb25880e07863b391cf7124e7ffa1338b0d65600dfcec117c4223a7fb"
