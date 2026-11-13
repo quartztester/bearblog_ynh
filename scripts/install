@@ -7,6 +7,9 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
+# Upstream templates hardcode absolute '/' links
+[ "${path:-/}" = "/" ] || ynh_die "Bear Blog routes blogs by hostname and must be installed at the root of the domain (path=/)."
+
 #=================================================
 # INITIALIZE AND STORE SETTINGS
 #=================================================
