@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Django 6 needs Python >= 3.12, bookworm ships 3.11: runtime is a pinned
-# standalone CPython ($install_dir/python) + venv ($install_dir/.venv),
-# rebuilt from upstream requirements.txt on install/upgrade/restore.
+# Standalone CPython runtime ($install_dir/python + .venv), rebuilt from
+# requirements.txt on install/upgrade/restore (Django 6 > bookworm python 3.11).
 _build_runtime() {
     ynh_setup_source --dest_dir="$install_dir"
     ynh_setup_source --source_id=cpython --dest_dir="$install_dir"
@@ -24,8 +23,7 @@ _run_manage() {
     ynh_exec_as_app bash -c "cd '$install_dir' && .venv/bin/python manage.py $*"
 }
 
-# Blog owners get their account at install; password in a 600 file under data_dir.
-# Bootstrap itself is idempotent (user/stylesheet get_or_create).
+# Blog owner account; password in a 600 file under data_dir. Idempotent.
 _bootstrap_data() {
     local creds="$data_dir/admin_credentials.txt"
     if [ ! -f "$creds" ]; then
@@ -36,16 +34,15 @@ _bootstrap_data() {
 
     _run_manage "migrate --noinput"
     _run_manage "collectstatic --noinput --clear"
-    # sudo in ynh_exec_as_app resets the environment -> pass vars via env
+    # ynh_exec_as_app sudo resets the env -> pass vars via env
     ynh_exec_as_app env \
         BB_ADMIN_EMAIL="$(ynh_user_get_info --username="$admin" --key=mail)" \
         BB_ADMIN_PASSWORD="$(cat "$creds")" \
         bash -c "cd '$install_dir' && .venv/bin/python manage.py shell" < "$YNH_APP_BASEDIR/conf/bootstrap.py"
 }
 
-# Blogs are resolved by Host (<blog>.<domain>), which the app's own nginx
-# snippet under the domain block cannot serve -> http-level catch-all using
-# the main domain's cert. Needs a wildcard cert for valid TLS, see ADMIN.md.
+# Host-based blog routing needs a wildcard server block outside the app's
+# nginx snippet; TLS reuses the main domain's cert, see doc/ADMIN.md.
 _add_blogs_nginx() {
     ynh_config_add --template="nginx_blogs.conf" --destination="/etc/nginx/conf.d/$app-blogs.conf"
     ynh_systemctl --service=nginx --action=reload

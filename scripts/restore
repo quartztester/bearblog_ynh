@@ -26,6 +26,9 @@ chown -R "$app:$app" "$data_dir"
 # .env embeds domain-specific values -> re-render from settings, not archive
 _render_config
 
+# Runtime code is rebuilt from the package, DB from the archive -> align schema
+_run_manage "migrate --noinput"
+
 #=================================================
 # RESTORE SYSTEM CONFIGURATION
 #=================================================
