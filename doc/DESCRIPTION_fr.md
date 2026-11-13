@@ -1,19 +1,16 @@
-Bear Blog est une plateforme de publication de blogs personnels écrits en
-Markdown : sans traqueurs, sans style lourd, rendu côté serveur, pages très
-rapides. C'est le moteur de bearblog.dev, empaqueté pour l'auto-hébergement.
+Plateforme de publication de blogs personnels en Markdown. Sans traqueurs,
+sans style lourd, rendu côté serveur, pages rapides. Moteur de bearblog.dev,
+empaqueté pour l'auto-hébergement.
 
 ### Fonctionnalités
 
-- Éditeur Markdown avec aperçu en direct
-- Chaque utilisateur inscrit obtient son propre blog, servi sur un
-  sous-domaine (`monblog.exemple.org`) ou un domaine personnalisé
-- Page d'accueil, inscription et tableau de bord (articles, pages, tags, flux)
-- Flux RSS/Atom/JSON, sitemap, statistiques de base avec hachage d'IP et
-  géolocalisation par pays
-- Un compte propriétaire est créé à l'installation depuis l'administrateur
-  YunoHost choisi ; les autres utilisateurs s'inscrivent via le formulaire
+- Éditeur Markdown, aperçu en direct
+- Chaque utilisateur inscrit a son blog sur un sous-domaine
+  (`monblog.exemple.org`) ou un domaine perso
+- Page d'accueil, inscription, tableau de bord (articles, pages, tags, flux)
+- Flux RSS/Atom/JSON, sitemap, statistiques basiques (IP hachées, pays GeoIP)
+- Un compte propriétaire créé à l'installation depuis l'admin YunoHost choisi ;
+  les autres s'inscrivent seuls
 
-Le projet amont est le code source du SaaS hébergé et n'est pas conçu pour
-l'auto-hébergement : certaines fonctions propres au SaaS (paiements,
-téléversements média vers S3) sont inactives dans ce paquet, voir la
-documentation administrateur.
+L'amont est le code du SaaS hébergé, pas conçu pour l'auto-hébergement.
+Fonctions SaaS pures (paiements, médias S3) inactives ici — voir doc admin.
