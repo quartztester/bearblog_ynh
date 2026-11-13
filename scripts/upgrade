@@ -1,43 +1,29 @@
 #!/bin/bash
 
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
+# load helpers
 source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# STOP SYSTEMD SERVICE
-#=================================================
+# stop service
 ynh_script_progression "Stopping $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="stop"
 
-#=================================================
-# ENSURE DOWNWARD COMPATIBILITY
-#=================================================
+# downward compat
 ynh_script_progression "Ensuring downward compatibility..."
 
 ynh_app_setting_set_default --key=secret_key --value="$(ynh_string_random --length=50)"
 ynh_app_setting_set_default --key=analytics_salt --value="$(ynh_string_random --length=32)"
 
-#=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
-#=================================================
-
+# source
 _build_runtime
 
-#=================================================
-# UPDATE A CONFIG FILE
-#=================================================
+# update config
 ynh_script_progression "Updating $app's configuration files..."
 
 _render_config
 
-#=================================================
-# MIGRATE DATABASE
-#=================================================
+# migrate db
 ynh_script_progression "Upgrading the database..."
 
 _run_manage "migrate --noinput"
@@ -47,9 +33,7 @@ ynh_exec_as_app env \
     BB_ADMIN_PASSWORD="$(cat "$data_dir/admin_credentials.txt" 2>/dev/null || echo unused)" \
     bash -c "cd '$install_dir' && .venv/bin/python manage.py shell" < "$YNH_APP_BASEDIR/conf/bootstrap.py"
 
-#=================================================
-# REAPPLY SYSTEM CONFIGURATION
-#=================================================
+# reapply system config
 ynh_script_progression "Upgrading system configurations related to $app..."
 
 ynh_config_add_nginx
@@ -61,15 +45,9 @@ yunohost service add "$app" --description="Bear Blog publishing platform" --log=
 
 ynh_config_add_logrotate
 
-#=================================================
-# START SYSTEMD SERVICE
-#=================================================
+# start service
 ynh_script_progression "Starting $app's systemd service..."
 
 ynh_systemctl --service="$app" --action="start" --wait_until="Booting worker"
-
-#=================================================
-# END OF SCRIPT
-#=================================================
 
 ynh_script_progression "Upgrade of $app completed"

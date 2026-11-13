@@ -1,18 +1,18 @@
-Bear Blog is a publishing platform for personal blogs written in Markdown:
-no trackers, no heavy styling, server-side rendering, very fast pages.
-It is the engine behind bearblog.dev, packaged for self-hosting.
+Bear Blog: publishing platform for personal Markdown blogs. No trackers, no
+heavy styling, server-side rendering, fast pages. Engine behind bearblog.dev,
+packaged for self-hosting.
 
 ### Features
 
-- Markdown-first editor with live preview
-- Each registered user gets their own blog, served on a subdomain
+- Markdown-first editor, live preview
+- Each registered user gets their own blog, on a subdomain
   (`myblog.example.org`) or a custom domain
-- Landing page, signup flow and dashboard (posts, pages, tags, feeds)
-- RSS/Atom/JSON feeds, sitemap, basic analytics with IP hashing and
-  GeoIP country resolution
-- One blog owner account is created at install from the chosen YunoHost
-  admin; further users self-register through the app's signup form
+- Landing page, signup flow, dashboard (posts, pages, tags, feeds)
+- RSS/Atom/JSON feeds, sitemap, basic analytics, IP hashing, GeoIP country
+  resolution
+- One blog owner account created at install from the chosen YunoHost admin.
+  Further users self-register through the app's signup form
 
-The upstream project is the source of the hosted SaaS and is not designed
-for self-hosting: some SaaS-only parts (payments page, S3 media uploads)
-are inert in this package, see the admin documentation.
+Upstream powers the hosted SaaS. Not designed for self-hosting. Some
+SaaS-only parts (payments page, S3 media uploads) are inert here — see the
+admin documentation.
