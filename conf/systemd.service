@@ -31,7 +31,9 @@ ProtectKernelModules=yes
 ProtectKernelTunables=yes
 LockPersonality=yes
 SystemCallArchitectures=native
-SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap @cpu-emulation @privileged
+# ponytail: ~@privileged dropped - on arm64/bookworm systemd it denies fchownat and
+# SIGSYS-kills gunicorn at startup (CI audit syscall=54). Re-add per-arch if upstream fixes.
+SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap @cpu-emulation
 
 # Denying options to capabilities that should not be relevant for webapps
 # Doc: https://manpages.ubuntu.com/manpages/jammy/en/man7/capabilities.7.html
