@@ -1,0 +1,79 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "bearblog"
+name = "Bear Blog"
+description.en = "Publish minimalist Markdown blogs, one per user, on subdomains"
+description.fr = "Publiez des blogs Markdown minimalistes, un par utilisateur, sur sous-domaines"
+
+version = "2026.10.21~ynh1"
+
+maintainers = []
+
+[upstream]
+license = "LicenseRef-Bear-Blog-2.0"
+license_url = "https://raw.githubusercontent.com/HermanMartinus/bearblog/master/LICENSE.md"
+website = "https://bearblog.dev"
+admindoc = "https://herman.bearblog.dev/building-software-to-last-forever/"
+code = "https://github.com/HermanMartinus/bearblog"
+
+[integration]
+yunohost = ">= 12.1.17"
+helpers_version = "2.1"
+architectures = ["amd64", "arm64"]
+multi_instance = false
+
+ldap = false
+sso = false
+
+disk = "300M"
+ram.build = "350M"
+ram.runtime = "200M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/"
+    help.en = "Bear Blog routes blogs by hostname (blog.domain.tld), so keep the root path '/'."
+    help.fr = "Bear Blog route les blogs par nom d'hôte (blog.domaine.tld), gardez le chemin racine « / »."
+
+    [install.init_main_permission]
+    type = "group"
+    default = "visitors"
+    help.en = "Keep 'Visitors' so blogs and signup stay public. 'Only users' hides the whole instance behind the portal login."
+    help.fr = "Gardez « Visiteurs » pour que les blogs et l'inscription restent publics. « Utilisateurs uniquement » masque toute l'instance derrière le portail."
+
+    [install.admin]
+    type = "user"
+
+[resources]
+    [resources.sources]
+
+    [resources.sources.main]
+    url = "https://github.com/HermanMartinus/bearblog/archive/b4b4698c8e53057b3b9c2a00ee6493db83516480.tar.gz"
+    sha256 = "3728ab64cf54464ab53a959156c87dbafc794f3bc693d451cb338f59b971a78a"
+    in_subdir = 1
+    autoupdate.strategy = "latest_github_commit"
+
+    # Django 6 requires Python >= 3.12; bookworm ships 3.11 -> pinned standalone CPython
+    [resources.sources.cpython]
+    url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.13.18%2B20261110-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+    sha256 = "f2d2199eb25880e07863b391cf7124e7ffa1338b0d65600dfcec117c4223a7fb"
+    arm64.url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.13.18%2B20261110-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+    arm64.sha256 = "55c00325f7c1fddf325dfc621aabdfbbac4dc54adda224af88ec411dc12db239"
+    in_subdir = false
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+
+    [resources.permissions]
+    main.url = "/"
+
+    [resources.ports]
