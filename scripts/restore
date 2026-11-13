@@ -45,8 +45,9 @@ yunohost service add "$app" --description="Bear Blog publishing platform" --log=
 
 ynh_restore "/etc/logrotate.d/$app"
 
-ynh_restore "/var/log/$app/"
-chown -R "$app:$app" "/var/log/$app"
+# no trailing slash: ynh_restore's data-dir detection misses it and
+# re-applies root:root 400 config perms -> gunicorn EACCES
+ynh_restore "/var/log/$app"
 
 #=================================================
 # RELOAD NGINX AND THE APP SERVICE
